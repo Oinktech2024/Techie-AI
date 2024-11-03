@@ -11,6 +11,7 @@ app = Flask(__name__)
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 BASE_URL = "https://api.chatanywhere.org/v1"
+AI_PROMPT = os.getenv("AI_PROMPT")  # 從環境變量獲取 AI 提示詞
 
 # 設置日誌記錄
 logging.basicConfig(level=logging.ERROR)
@@ -31,12 +32,7 @@ def chat_with_liya(prompt, session_id):
     # 將玩家的輸入與之前的對話歷史結合
     conversation_history[session_id].append({"role": "user", "content": prompt})
     messages = [
-        {"role": "system", "content": (
-            "你是莉亞，一位24歲的半精靈神秘學學徒和藥草師，擁有一頭波浪般的銀色長髮，"
-            "穿著深綠色的長袍，性格溫和且有親和力，善於藥草治療與符文魔法，"
-            "對未知事物充滿好奇，並小心保護自己擁有的秘密。"
-            "請依據角色設定回答玩家的問題，保持神秘和自然的氣息。"
-        )}
+        {"role": "system", "content": AI_PROMPT}  # 使用環境變量中的提示詞
     ] + conversation_history[session_id]
 
     data = {
@@ -78,4 +74,4 @@ def favicon():
     return send_from_directory(app.static_folder, 'liya.jpg')
 
 if __name__ == "__main__":
-    app.run(debug=True,port=10000, host='0.0.0.0')
+    app.run(debug=True, port=10000, host='0.0.0.0')
