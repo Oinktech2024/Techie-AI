@@ -40,21 +40,8 @@ function sendMessage() {
         return response.json();
     })
     .then(data => {
-        displayTypingIndicator(); // 顯示正在輸入的指示
-        let response = data.response;
-
-        // 模擬逐字輸出效果
-        let i = 0;
-        const typingSpeed = 50; // 50毫秒
-        const typingInterval = setInterval(() => {
-            if (i < response.length) {
-                typeLiyaResponse(response.charAt(i)); // 實時更新
-                i++;
-            } else {
-                clearInterval(typingInterval); // 停止定時器
-                toggleSendButtonVisibility(true); // 回復發送按鈕顯示
-            }
-        }, typingSpeed);
+        // 開始逐步顯示 AI 的回應
+        typeLiyaResponse(data.response);
     })
     .catch(error => {
         errorMsg.textContent = error.message;
@@ -62,20 +49,27 @@ function sendMessage() {
     });
 }
 
-function typeLiyaResponse(char) {
+function typeLiyaResponse(response) {
     const chatBox = document.getElementById("chat-box");
-    const lastMessage = chatBox.lastElementChild;
-
-    if (lastMessage && lastMessage.classList.contains("liya-message")) {
-        lastMessage.innerHTML += char; // 實時更新內容
-    } else {
-        const liyaMessage = document.createElement("div");
-        liyaMessage.classList.add("liya-message", "fade-in");
-        liyaMessage.innerHTML = `<strong><img src='https://techieai.onrender.com/static/bot.jpg' class='bot-head' alt='Techie'></img>AI:</strong> ${char}`;
-        chatBox.appendChild(liyaMessage);
-    }
+    const liyaMessage = document.createElement("div");
+    liyaMessage.classList.add("liya-message", "fade-in");
+    liyaMessage.innerHTML = `<strong><img src='https://techieai.onrender.com/static/bot.jpg' class='bot-head' alt='Techie'></img>AI:</strong> `;
+    chatBox.appendChild(liyaMessage);
     
     chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
+
+    // 模擬逐字輸出效果
+    let i = 0;
+    const typingSpeed = 1; // 1毫秒
+    const typingInterval = setInterval(() => {
+        if (i < response.length) {
+            liyaMessage.innerHTML += response.charAt(i); // 實時更新
+            i++;
+        } else {
+            clearInterval(typingInterval); // 停止定時器
+            toggleSendButtonVisibility(true); // 回復發送按鈕顯示
+        }
+    }, typingSpeed);
 }
 
 function appendMessage(role, message) {
