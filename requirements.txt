@@ -1,5 +1,4 @@
 Flask
-torch
-transformers==4.31.0
-Pillow==9.3.0
+request
+python-dotenv
 werkzeug
