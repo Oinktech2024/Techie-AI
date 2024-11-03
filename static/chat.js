@@ -25,6 +25,9 @@ function sendMessage() {
     document.getElementById("user-input").value = "";
     toggleSendButtonVisibility(false); // 隱藏發送按鈕
 
+    // 顯示「正在生成中」動畫
+    displayLoadingMessage();
+
     fetch("/chat", {
         method: "POST",
         headers: {
@@ -40,6 +43,7 @@ function sendMessage() {
         return response.json();
     })
     .then(data => {
+        removeLoadingMessage(); // 移除加載消息
         typeLiyaResponse(data.response);
     })
     .catch(error => {
@@ -48,33 +52,34 @@ function sendMessage() {
     });
 }
 
+function displayLoadingMessage() {
+    const chatBox = document.getElementById("chat-box");
+    const loadingMessage = document.createElement("div");
+    loadingMessage.id = "loading-message";
+    loadingMessage.innerHTML = "<strong>正在生成中</strong><div class='loading-dots'></div><div class='loading-dots'></div><div class='loading-dots'></div>"; // 添加點的動畫
+    chatBox.appendChild(loadingMessage);
+    chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
+}
+
+function removeLoadingMessage() {
+    const loadingMessage = document.getElementById("loading-message");
+    if (loadingMessage) {
+        loadingMessage.remove(); // 移除「正在生成中」的消息
+    }
+}
+
 function typeLiyaResponse(response) {
     const chatBox = document.getElementById("chat-box");
     const liyaMessage = document.createElement("div"); // 使用 div 而不是 p，因為要顯示 HTML 標籤
     liyaMessage.classList.add("liya-message", "fade-in");
     liyaMessage.innerHTML = `<strong><img src='https://techieai.onrender.com/static/bot.jpg' class='bot-head' alt='Techie'></img>AI:</strong> `;
     
-    // 將消息添加到聊天框
+    response = formatResponse(response); // 格式化響應
+    liyaMessage.innerHTML += response; // 將格式化後的響應添加到消息中
+
     chatBox.appendChild(liyaMessage);
     chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
-
-    // 逐步顯示回應
-    let index = 0;
-    const typingSpeed = 50; // 每個字符的延遲（毫秒）
-
-    function typeCharacter() {
-        if (index < response.length) {
-            const formattedChar = formatCharacter(response[index]);
-            liyaMessage.innerHTML += formattedChar; // 添加格式化字符
-            index++;
-            chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
-            setTimeout(typeCharacter, typingSpeed); // 設定下一個字符的顯示
-        } else {
-            toggleSendButtonVisibility(true); // 回復發送按鈕顯示
-        }
-    }
-
-    typeCharacter(); // 開始顯示字符
+    toggleSendButtonVisibility(true); // 回復發送按鈕顯示
 }
 
 function appendMessage(role, message) {
@@ -155,6 +160,12 @@ function toggleTheme() {
 }
 
 function formatResponse(text) {
+    // 格式化標題（# 標題，## 標題，### 標題）
+    text = text.replace(/^(#{1,3})\s*(.+)$/gm, (match, hashes, content) => {
+        const level = hashes.length;
+        return `<h${level}>${content}</h${level}>`;
+    });
+
     // 格式化粗體文本（**這樣**）
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="highlighted">$1</strong>');
 
@@ -191,29 +202,7 @@ function formatResponse(text) {
     if (isList) formattedText += "</ol>"; // 關閉未完成的列表
 
     // 格式化鏈接（[鏈接文字](鏈接地址)）
-    formattedText = formattedText.replace(/\[([^\]]+)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-    // 格式化代碼（`代碼` 和 ```多行代碼```）
-    formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
-    formattedText = formattedText.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    formattedText = formattedText.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
     return formattedText; // 返回格式化後的文本
-}
-
-// 實時格式化每個字符
-function formatCharacter(char) {
-    // 支持的 Markdown 語法
-    const bold = /\*\*(.*?)\*\*/g; // 粗體
-    const italic = /(\*|_)(.*?)\1/g; // 斜體
-    const link = /\[([^\]]+)\]\((.*?)\)/g; // 鏈接
-    const code = /`([^`]+)`/g; // 單行代碼
-    const multiCode = /```([\s\S]*?)```/g; // 多行代碼
-
-    char = char.replace(bold, '<strong>$1</strong>');
-    char = char.replace(italic, '<em>$2</em>');
-    char = char.replace(link, '<a href="$2" target="_blank">$1</a>');
-    char = char.replace(code, '<code>$1</code>');
-    char = char.replace(multiCode, '<pre><code>$1</code></pre>');
-
-    return char;
 }
