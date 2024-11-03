@@ -39,6 +39,7 @@ function sendMessage() {
         return response.json();
     })
     .then(data => {
+        // 確保在此處初始化 currentResponse
         currentResponse = data.response;
         typeLiyaResponse(currentResponse);
     })
@@ -56,8 +57,6 @@ function typeLiyaResponse(response) {
     chatBox.appendChild(liyaMessage);
     
     let index = 0;
-    let isGenerating = true; // 確保可以停止生成
-
     // 更新按鈕狀態
     togglePauseButton(true);
 
@@ -74,7 +73,7 @@ function typeLiyaResponse(response) {
             clearInterval(typingInterval);
             togglePauseButton(false); // 恢復按鈕狀態
         }
-    }, 10); // 調整速度
+    }, 50); // 調整速度
 }
 
 function appendMessage(role, message) {
