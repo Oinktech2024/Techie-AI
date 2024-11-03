@@ -50,17 +50,15 @@ function sendMessage() {
 
 function typeLiyaResponse(response) {
     const chatBox = document.getElementById("chat-box");
-    const liyaMessage = document.createElement("p");
+    const liyaMessage = document.createElement("div"); // 使用 div 以支持多種標籤
     liyaMessage.classList.add("liya-message", "fade-in");
-    liyaMessage.innerHTML = `<strong><img src='https://techieai.onrender.com/static/bot.jpg' alt="Techie" class='bot-head'></img>AI:</strong> `;
+    liyaMessage.innerHTML = `<strong><img src='bot.jpg' class='bot-head'></img>AI:</strong> ${formatResponse(response)}`; // 將格式化響應設置為 innerHTML
     chatBox.appendChild(liyaMessage);
-
-    response = formatResponse(response); // 格式化響應
 
     let index = 0;
     const typingInterval = setInterval(() => {
-        if (index < response.length) {
-            liyaMessage.innerHTML += response.charAt(index);
+        if (index < liyaMessage.innerHTML.length) {
+            liyaMessage.innerHTML = liyaMessage.innerHTML.charAt(index);
             index++;
             chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
         } else {
@@ -150,7 +148,7 @@ function toggleTheme() {
 function formatResponse(text) {
     // 格式化粗體文本（**這樣**）
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="highlighted">$1</strong>');
-    
+
     // 格式化斜體文本（*這樣* 或 _這樣_）
     text = text.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
 
@@ -177,7 +175,7 @@ function formatResponse(text) {
                 formattedText += "</ol>"; // 關閉有序列表
                 isList = false;
             }
-            formattedText += `${line}`; // 直接加上行
+            formattedText += `<p>${line}</p>`;
         }
     });
 
@@ -189,7 +187,6 @@ function formatResponse(text) {
     // 格式化代碼（`代碼` 和 ```多行代碼```）
     formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
     formattedText = formattedText.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
-    formattedText = formattedText.replace(/<[^>]+>/g, ''); // 移除所有的 HTML 標籤
 
-    return formattedText.trim();
+    return formattedText;
 }
