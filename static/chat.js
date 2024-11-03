@@ -74,7 +74,7 @@ function typeLiyaResponse(response) {
             clearInterval(typingInterval);
             togglePauseButton(false); // 恢復按鈕狀態
         }
-    }, 50); // 調整速度
+    }, 10); // 調整速度
 }
 
 function appendMessage(role, message) {
@@ -133,7 +133,7 @@ function stopVoiceRecognition() {
 
 function togglePause() {
     isPaused = !isPaused;
-    togglePauseButton(!isPaused);
+    togglePauseButton(isPaused);
 }
 
 function togglePauseButton(isActive) {
