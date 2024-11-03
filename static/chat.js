@@ -40,7 +40,21 @@ function sendMessage() {
         return response.json();
     })
     .then(data => {
-        typeLiyaResponse(data.response);
+        displayTypingIndicator(); // 顯示正在輸入的指示
+        let response = data.response;
+
+        // 模擬逐字輸出效果
+        let i = 0;
+        const typingSpeed = 50; // 50毫秒
+        const typingInterval = setInterval(() => {
+            if (i < response.length) {
+                typeLiyaResponse(response.charAt(i)); // 實時更新
+                i++;
+            } else {
+                clearInterval(typingInterval); // 停止定時器
+                toggleSendButtonVisibility(true); // 回復發送按鈕顯示
+            }
+        }, typingSpeed);
     })
     .catch(error => {
         errorMsg.textContent = error.message;
@@ -48,18 +62,20 @@ function sendMessage() {
     });
 }
 
-function typeLiyaResponse(response) {
+function typeLiyaResponse(char) {
     const chatBox = document.getElementById("chat-box");
-    const liyaMessage = document.createElement("div"); // 使用 div 而不是 p，因為要顯示 HTML 標籤
-    liyaMessage.classList.add("liya-message", "fade-in");
-    liyaMessage.innerHTML = `<strong><img src='bot.jpg' class='bot-head'></img>AI:</strong> `;
-    
-    response = formatResponse(response); // 格式化響應
-    liyaMessage.innerHTML += response; // 將格式化後的響應添加到消息中
+    const lastMessage = chatBox.lastElementChild;
 
-    chatBox.appendChild(liyaMessage);
+    if (lastMessage && lastMessage.classList.contains("liya-message")) {
+        lastMessage.innerHTML += char; // 實時更新內容
+    } else {
+        const liyaMessage = document.createElement("div");
+        liyaMessage.classList.add("liya-message", "fade-in");
+        liyaMessage.innerHTML = `<strong><img src='https://techieai.onrender.com/static/bot.jpg' class='bot-head' alt='Techie'></img>AI:</strong> ${char}`;
+        chatBox.appendChild(liyaMessage);
+    }
+    
     chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
-    toggleSendButtonVisibility(true); // 回復發送按鈕顯示
 }
 
 function appendMessage(role, message) {
@@ -140,11 +156,24 @@ function toggleTheme() {
 }
 
 function formatResponse(text) {
-    // 格式化粗體文本（**這樣**）
+    // 格式化標題
+    text = text.replace(/^(#{1,6})\s*(.*?)$/gm, (match, hashes, title) => {
+        const level = hashes.length; // 計算標題的層級
+        return `<h${level}>${title}</h${level}>`; // 返回對應的 h 標籤
+    });
+
+    // 格式化粗體文本（**這樣** 或 __這樣__）
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="highlighted">$1</strong>');
+    text = text.replace(/__(.*?)__/g, '<strong class="highlighted">$1</strong>');
 
     // 格式化斜體文本（*這樣* 或 _這樣_）
     text = text.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
+
+    // 格式化刪除線（~~這樣~~）
+    text = text.replace(/~~(.*?)~~/g, '<del>$1</del>');
+
+    // 格式化引用（> 這樣）
+    text = text.replace(/^\> (.*)$/gm, '<blockquote>$1</blockquote>');
 
     // 格式化有序列表
     let lines = text.split("\n");
@@ -178,8 +207,13 @@ function formatResponse(text) {
     // 格式化鏈接（[鏈接文字](鏈接地址)）
     formattedText = formattedText.replace(/\[([^\]]+)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-    // 格式化代碼（`代碼` 和 ```多行代碼```）
+    // 格式化圖片（![描述](網址)）
+    formattedText = formattedText.replace(/!\[([^\]]*)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%;"/>');
+
+    // 格式化行內代碼（`代碼`）
     formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // 格式化多行代碼塊（```多行代碼```）
     formattedText = formattedText.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
 
     return formattedText; // 返回格式化後的文本
