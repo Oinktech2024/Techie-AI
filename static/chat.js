@@ -54,12 +54,27 @@ function typeLiyaResponse(response) {
     liyaMessage.classList.add("liya-message", "fade-in");
     liyaMessage.innerHTML = `<strong><img src='https://techieai.onrender.com/static/bot.jpg' class='bot-head' alt='Techie'></img>AI:</strong> `;
     
-    response = formatResponse(response); // 格式化響應
-    liyaMessage.innerHTML += response; // 將格式化後的響應添加到消息中
-
+    // 將消息添加到聊天框
     chatBox.appendChild(liyaMessage);
     chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
-    toggleSendButtonVisibility(true); // 回復發送按鈕顯示
+
+    // 逐步顯示回應
+    let index = 0;
+    const typingSpeed = 50; // 每個字符的延遲（毫秒）
+
+    function typeCharacter() {
+        if (index < response.length) {
+            const formattedChar = formatCharacter(response[index]);
+            liyaMessage.innerHTML += formattedChar; // 添加格式化字符
+            index++;
+            chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
+            setTimeout(typeCharacter, typingSpeed); // 設定下一個字符的顯示
+        } else {
+            toggleSendButtonVisibility(true); // 回復發送按鈕顯示
+        }
+    }
+
+    typeCharacter(); // 開始顯示字符
 }
 
 function appendMessage(role, message) {
@@ -139,14 +154,6 @@ function toggleTheme() {
         '<i class="fas fa-moon"></i>';
 }
 
-// 新增的即時格式化響應
-document.getElementById("user-input").addEventListener("input", (event) => {
-    const userInput = event.target.value; // 獲取當前輸入框的內容
-    const liveResponseBox = document.getElementById("live-response"); // 一個用來顯示實時格式化文本的區域
-    liveResponseBox.innerHTML = formatResponse(userInput); // 實時格式化並更新顯示
-});
-
-// 格式化響應的函數
 function formatResponse(text) {
     // 格式化粗體文本（**這樣**）
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="highlighted">$1</strong>');
@@ -154,19 +161,13 @@ function formatResponse(text) {
     // 格式化斜體文本（*這樣* 或 _這樣_）
     text = text.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
 
-    // 格式化標題
-    text = text.replace(/^(#{1,6}) (.*)$/gm, (match, hashes, title) => {
-        const level = hashes.length; // 標題級別
-        return `<h${level}>${title}</h${level}>`;
-    });
-
     // 格式化有序列表
     let lines = text.split("\n");
     let formattedText = "";
     let isList = false;
 
     lines.forEach(line => {
-        if (/^\d+\.\s/.test(line)) { // 檢測有序列表
+        if (/^\d+\.\s/.test(line)) { // 檢測排序數字
             if (!isList) {
                 formattedText += "<ol class='custom-list'>";
                 isList = true;
@@ -178,11 +179,6 @@ function formatResponse(text) {
                 isList = true;
             }
             formattedText += `<li>${line.replace(/^\* |^\- /, "")}</li>`;
-        } else if (/^> (.*)/.test(line)) { // 檢測引用
-            formattedText += `<blockquote>${line.replace(/^> /, "")}</blockquote>`;
-        } else if (/~~(.*?)~~/.test(line)) { // 檢測刪除線
-            line = line.replace(/~~(.*?)~~/g, '<del>$1</del>');
-            formattedText += `<p>${line}</p>`;
         } else {
             if (isList) {
                 formattedText += "</ol>"; // 關閉有序列表
@@ -197,9 +193,27 @@ function formatResponse(text) {
     // 格式化鏈接（[鏈接文字](鏈接地址)）
     formattedText = formattedText.replace(/\[([^\]]+)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-    // 格式化行內代碼（`代碼`）和多行代碼（```多行代碼```）
+    // 格式化代碼（`代碼` 和 ```多行代碼```）
     formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
     formattedText = formattedText.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
 
     return formattedText; // 返回格式化後的文本
+}
+
+// 實時格式化每個字符
+function formatCharacter(char) {
+    // 支持的 Markdown 語法
+    const bold = /\*\*(.*?)\*\*/g; // 粗體
+    const italic = /(\*|_)(.*?)\1/g; // 斜體
+    const link = /\[([^\]]+)\]\((.*?)\)/g; // 鏈接
+    const code = /`([^`]+)`/g; // 單行代碼
+    const multiCode = /```([\s\S]*?)```/g; // 多行代碼
+
+    char = char.replace(bold, '<strong>$1</strong>');
+    char = char.replace(italic, '<em>$2</em>');
+    char = char.replace(link, '<a href="$2" target="_blank">$1</a>');
+    char = char.replace(code, '<code>$1</code>');
+    char = char.replace(multiCode, '<pre><code>$1</code></pre>');
+
+    return char;
 }
