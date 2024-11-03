@@ -73,5 +73,9 @@ def chat():
     liya_response = chat_with_liya(user_input, session_id)
     return jsonify({"response": liya_response})
 
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(app.static_folder, 'liya.jpg')
+
 if __name__ == "__main__":
     app.run(debug=True,port=10000, host='0.0.0.0')
