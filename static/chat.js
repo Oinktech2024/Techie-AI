@@ -4,13 +4,9 @@ document.getElementById("user-input").addEventListener("keypress", (event) => {
 });
 document.getElementById("voice-btn").addEventListener("click", toggleVoiceRecognition);
 document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
-document.getElementById("pause-btn").addEventListener("click", togglePause);
 
 let isListening = false;
-let isPaused = false;
 let recognition;
-let typingInterval; // 用於逐字顯示的間隔
-let currentResponse = ""; // 儲存完整的 AI 回應
 
 function sendMessage() {
     const userInput = document.getElementById("user-input").value.trim();
@@ -24,6 +20,9 @@ function sendMessage() {
     errorMsg.textContent = "";
     appendMessage("user", userInput);
     document.getElementById("user-input").value = "";
+
+    // 隱藏發送按鈕
+    toggleSendButtonVisibility(false);
 
     fetch("/chat", {
         method: "POST",
@@ -39,9 +38,7 @@ function sendMessage() {
         return response.json();
     })
     .then(data => {
-        // 確保在此處初始化 currentResponse
-        currentResponse = data.response;
-        typeLiyaResponse(currentResponse);
+        typeLiyaResponse(data.response);
     })
     .catch(error => {
         errorMsg.textContent = error.message;
@@ -57,21 +54,15 @@ function typeLiyaResponse(response) {
     chatBox.appendChild(liyaMessage);
     
     let index = 0;
-    // 更新按鈕狀態
-    togglePauseButton(true);
-
-    typingInterval = setInterval(() => {
-        if (isPaused) {
-            clearInterval(typingInterval);
-            return;
-        }
+    const typingInterval = setInterval(() => {
         if (index < response.length) {
             liyaMessage.innerHTML += response.charAt(index);
             index++;
             chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
         } else {
             clearInterval(typingInterval);
-            togglePauseButton(false); // 恢復按鈕狀態
+            // 回復發送按鈕顯示
+            toggleSendButtonVisibility(true);
         }
     }, 50); // 調整速度
 }
@@ -84,6 +75,12 @@ function appendMessage(role, message) {
     messageElement.innerHTML = `<strong>${role === "user" ? '你' : '莉亞'}:</strong> ${message} <span class="timestamp">${timestamp}</span>`;
     chatBox.appendChild(messageElement);
     chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
+}
+
+function toggleSendButtonVisibility(visible) {
+    const sendButton = document.getElementById("send-btn");
+    sendButton.style.opacity = visible ? "1" : "0"; // 根據可見性改變透明度
+    sendButton.style.transition = "opacity 0.5s ease"; // 設定透明度變化的過渡效果
 }
 
 function toggleVoiceRecognition() {
@@ -128,24 +125,6 @@ function stopVoiceRecognition() {
     isListening = false;
     recognition.stop(); // 停止語音識別
     document.getElementById("voice-btn").innerHTML = '<i class="fas fa-microphone"></i>'; // 返回麥克風圖標
-}
-
-function togglePause() {
-    isPaused = !isPaused;
-    togglePauseButton(isPaused);
-}
-
-function togglePauseButton(isActive) {
-    const pauseBtn = document.getElementById("pause-btn");
-    const sendBtn = document.getElementById("send-btn");
-
-    if (isActive) {
-        pauseBtn.classList.remove("hidden");
-        sendBtn.classList.add("hidden");
-    } else {
-        pauseBtn.classList.add("hidden");
-        sendBtn.classList.remove("hidden");
-    }
 }
 
 function logError(userInput, errorMessage) {
