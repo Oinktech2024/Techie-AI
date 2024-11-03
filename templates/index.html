@@ -5,21 +5,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>與莉亞對話</title>
-    <link rel="icon" href="{{ url_for('favicon') }}" type="image/x-icon">
     <link rel="stylesheet" href="/static/styles.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon"> <!-- 引入網站圖標 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome Icons -->
 </head>
 <body>
     <div class="chat-container">
         <div class="header">
             <h1>與莉亞對話</h1>
             <img src="/static/liya.jpg" alt="Liya" class="liya-image">
+            <button id="theme-toggle" class="theme-btn" title="切換主題">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
         <div id="chat-box"></div>
         <div class="input-container">
+            <button id="voice-btn" title="語音輸入">
+                <i class="fas fa-microphone"></i>
+            </button>
             <input type="text" id="user-input" placeholder="輸入你的問題..." />
             <button id="send-btn">發送</button>
-            <button id="pause-btn" class="hidden">暫停</button> <!-- 暫停按鈕 -->
-            <button id="voice-btn">🎤 語音輸入</button>
         </div>
         <div id="error-msg" class="error-message"></div>
     </div>
