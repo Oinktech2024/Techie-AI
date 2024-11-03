@@ -3,94 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理介面</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <title>管理員儀表板</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- 引入 Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
             background-color: #f8f9fa;
-            margin: 0;
+        }
+        .admin-container {
+            margin-top: 50px;
             padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        h1 {
-            text-align: center;
-            color: #333;
+        .prompt-list {
             margin-bottom: 20px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #ddd;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-            transition: background-color 0.3s ease;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        li {
-            margin-bottom: 5px;
-        }
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
-        .no-data {
-            text-align: center;
-            font-size: 1.2em;
-            color: #777;
+        .alert {
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>管理介面</h1>
-    {% if conversation_history|length == 0 %}
-        <div class="no-data animate__animated animate__fadeIn">沒有可用的對話歷史。</div>
-    {% else %}
-        <table>
-            <tr>
-                <th>Session ID</th>
-                <th>對話歷史</th>
-                <th>刪除</th>
-            </tr>
-            {% for session_id, messages in conversation_history.items() %}
-            <tr class="animate__animated animate__fadeIn">
-                <td>{{ session_id }}</td>
-                <td>
-                    <ul>
-                        {% for message in messages %}
-                        <li><strong>{{ message.role }}:</strong> {{ message.content }}</li>
-                        {% endfor %}
-                    </ul>
-                </td>
-                <td>
-                    <form action="{{ url_for('delete', session_id=session_id) }}" method="post" style="display:inline;">
-                        <button type="submit" class="delete-btn"><i class="fas fa-trash-alt"></i> 刪除</button>
-                    </form>
-                </td>
-            </tr>
+    <div class="container admin-container">
+        <h1>管理員儀表板</h1>
+        <h2>提示詞列表</h2>
+        <ul class="list-group prompt-list">
+            {% for prompt in prompts %}
+                <li class="list-group-item">{{ prompt.prompt }}</li>
             {% endfor %}
-        </table>
-    {% endif %}
+        </ul>
+        <h2>新增提示詞</h2>
+        <form id="add-prompt-form">
+            <div class="form-group">
+                <input type="text" id="new-prompt" class="form-control" placeholder="輸入新提示詞" required>
+            </div>
+            <button type="submit" class="btn btn-success">新增提示詞</button>
+        </form>
+        <div id="response-message"></div>
+        <a href="/admin/logout" class="btn btn-danger mt-3">登出</a>
+    </div>
+
+    <script>
+        document.getElementById("add-prompt-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const prompt = document.getElementById("new-prompt").value;
+
+            fetch("/admin/add_prompt", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ prompt: prompt })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.response);
+                if (data.response === "提示詞已新增。") {
+                    location.reload(); // 重新加載頁面以顯示新增的提示詞
+                }
+            });
+        });
+    </script>
+    <!-- 引入 Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
