@@ -3,6 +3,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import logging
+import uuid
 
 # 載入環境變量
 load_dotenv()
@@ -63,11 +64,25 @@ def home():
 def chat():
     user_input = request.json.get("prompt")
     session_id = request.headers.get("X-Session-ID")  # 使用 session ID 來分隔對話
+    if not session_id:  # 如果沒有提供 session ID，生成一個新的
+        session_id = str(uuid.uuid4())
+    
     if not user_input:
         return jsonify({"response": "請輸入有效的問題。"}), 400
     
     liya_response = chat_with_liya(user_input, session_id)
-    return jsonify({"response": liya_response})
+    return jsonify({"response": liya_response, "session_id": session_id})
+
+@app.route('/admin')
+def admin():
+    return render_template("admin.html", conversation_history=conversation_history)
+
+@app.route('/delete/<session_id>', methods=["POST"])
+def delete(session_id):
+    if session_id in conversation_history:
+        del conversation_history[session_id]
+        return jsonify({"status": "success", "message": "對話歷史已刪除。"})
+    return jsonify({"status": "error", "message": "找不到該對話歷史。"}), 404
 
 @app.route('/favicon.ico')
 def favicon():
