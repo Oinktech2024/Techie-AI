@@ -50,22 +50,16 @@ function sendMessage() {
 
 function typeLiyaResponse(response) {
     const chatBox = document.getElementById("chat-box");
-    const liyaMessage = document.createElement("div"); // 使用 div 以支持多種標籤
+    const liyaMessage = document.createElement("div"); // 使用 div 而不是 p，因為要顯示 HTML 標籤
     liyaMessage.classList.add("liya-message", "fade-in");
-    liyaMessage.innerHTML = `<strong><img src='bot.jpg' class='bot-head'></img>AI:</strong> ${formatResponse(response)}`; // 將格式化響應設置為 innerHTML
-    chatBox.appendChild(liyaMessage);
+    liyaMessage.innerHTML = `<strong><img src='bot.jpg' class='bot-head'></img>AI:</strong> `;
+    
+    response = formatResponse(response); // 格式化響應
+    liyaMessage.innerHTML += response; // 將格式化後的響應添加到消息中
 
-    let index = 0;
-    const typingInterval = setInterval(() => {
-        if (index < liyaMessage.innerHTML.length) {
-            liyaMessage.innerHTML = liyaMessage.innerHTML.charAt(index);
-            index++;
-            chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
-        } else {
-            clearInterval(typingInterval);
-            toggleSendButtonVisibility(true); // 回復發送按鈕顯示
-        }
-    }, 10); // 調整速度
+    chatBox.appendChild(liyaMessage);
+    chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
+    toggleSendButtonVisibility(true); // 回復發送按鈕顯示
 }
 
 function appendMessage(role, message) {
@@ -188,5 +182,5 @@ function formatResponse(text) {
     formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
     formattedText = formattedText.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
 
-    return formattedText;
+    return formattedText; // 返回格式化後的文本
 }
