@@ -4,15 +4,24 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>與莉亞對話</title>
+    <title>與角色對話</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <div class="chat-container">
         <div class="header">
-            <h1>與莉亞對話</h1>
+            <h1>與角色對話</h1>
             <img src="/static/liya.jpg" alt="Liya" class="liya-image">
         </div>
+        
+        <!-- 角色選擇下拉選單 -->
+        <label for="character-select">選擇角色:</label>
+        <select id="character-select">
+            {% for character in characters %}
+                <option value="{{ character }}">{{ character }}</option>
+            {% endfor %}
+        </select>
+
         <div id="chat-box"></div>
         <div class="input-container">
             <input type="text" id="user-input" placeholder="輸入你的問題..." />
