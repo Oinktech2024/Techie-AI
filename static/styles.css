@@ -1,0 +1,99 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #f5f9f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.chat-container {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 450px;
+    max-width: 90%;
+    display: flex;
+    flex-direction: column;
+}
+
+h1 {
+    text-align: center;
+    color: #4CAF50;
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+#chat-box {
+    border: 1px solid #ddd;
+    padding: 15px;
+    height: 350px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+.user-message, .liya-message {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.user-message {
+    background-color: #e0f7da;
+    text-align: right;
+    color: #333;
+}
+
+.liya-message {
+    background-color: #ffe0e6;
+    text-align: left;
+    color: #333;
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+}
+
+#user-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+.liya-image {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#send-btn {
+    padding: 12px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#send-btn:hover {
+    background-color: #45a049;
+}
+
+.error-message {
+    color: red;
+    font-size: 0.85em;
+    text-align: center;
+    margin-top: 5px;
+}
