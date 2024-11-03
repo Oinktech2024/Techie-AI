@@ -1,4 +1,6 @@
-會將sesson id儲存在indexdb
+// 在頁面加載時生成 session ID
+const sessionId = 'session_' + Math.random().toString(36).substring(2, 15);
+
 document.getElementById("send-btn").addEventListener("click", sendMessage);
 document.getElementById("user-input").addEventListener("keypress", (event) => {
     if (event.key === "Enter") sendMessage();
@@ -28,7 +30,8 @@ function sendMessage() {
     fetch("/chat", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-Session-ID": sessionId // 將 session ID 發送到服務器
         },
         body: JSON.stringify({ prompt: userInput })
     })
@@ -65,7 +68,7 @@ function typeLiyaResponse(response) {
             // 回復發送按鈕顯示
             toggleSendButtonVisibility(true);
         }
-    }, 50); // 調整速度
+    }, 10); // 調整速度
 }
 
 function appendMessage(role, message) {
