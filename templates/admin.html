@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理介面</title>
+</head>
+<body>
+    <h1>管理介面</h1>
+    <table border="1">
+        <tr>
+            <th>Session ID</th>
+            <th>對話歷史</th>
+            <th>刪除</th>
+        </tr>
+        {% for session_id, messages in conversation_history.items() %}
+        <tr>
+            <td>{{ session_id }}</td>
+            <td>
+                <ul>
+                    {% for message in messages %}
+                    <li><strong>{{ message.role }}:</strong> {{ message.content }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>
+                <form action="{{ url_for('delete', session_id=session_id) }}" method="post" style="display:inline;">
+                    <button type="submit">刪除</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
