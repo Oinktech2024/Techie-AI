@@ -52,7 +52,7 @@ function typeLiyaResponse(response) {
     const chatBox = document.getElementById("chat-box");
     const liyaMessage = document.createElement("p");
     liyaMessage.classList.add("liya-message", "fade-in");
-    liyaMessage.innerHTML = `<strong><img src='bot.jpg' class='bot-head'></img>AI:</strong> `;
+    liyaMessage.innerHTML = `<strong><img src='https://techieai.onrender.com/static/bot.jpg' alt="Techie" class='bot-head'></img>AI:</strong> `;
     chatBox.appendChild(liyaMessage);
 
     response = formatResponse(response); // 格式化響應
@@ -150,12 +150,14 @@ function toggleTheme() {
 function formatResponse(text) {
     // 格式化粗體文本（**這樣**）
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="highlighted">$1</strong>');
+    
+    // 格式化斜體文本（*這樣* 或 _這樣_）
+    text = text.replace(/(\*|_)(.*?)\1/g, '<em>$2</em>');
 
     // 格式化有序列表
     let lines = text.split("\n");
     let formattedText = "";
     let isList = false;
-    let listCounter = 1;
 
     lines.forEach(line => {
         if (/^\d+\.\s/.test(line)) { // 檢測排序數字
@@ -164,9 +166,15 @@ function formatResponse(text) {
                 isList = true;
             }
             formattedText += `<li>${line.replace(/^\d+\.\s/, "")}</li>`;
+        } else if (/^\* /g.test(line) || /^\- /g.test(line)) { // 檢測無序列表
+            if (!isList) {
+                formattedText += "<ul class='custom-list'>";
+                isList = true;
+            }
+            formattedText += `<li>${line.replace(/^\* |^\- /, "")}</li>`;
         } else {
             if (isList) {
-                formattedText += "</ol>";
+                formattedText += "</ol>"; // 關閉有序列表
                 isList = false;
             }
             formattedText += `<p>${line}</p>`;
@@ -174,6 +182,13 @@ function formatResponse(text) {
     });
 
     if (isList) formattedText += "</ol>"; // 關閉未完成的列表
+
+    // 格式化鏈接（[鏈接文字](鏈接地址)）
+    formattedText = formattedText.replace(/\[([^\]]+)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+    // 格式化代碼（`代碼` 和 ```多行代碼```）
+    formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
+    formattedText = formattedText.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
 
     return formattedText;
 }
