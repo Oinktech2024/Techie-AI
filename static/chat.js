@@ -4,9 +4,13 @@ document.getElementById("user-input").addEventListener("keypress", (event) => {
 });
 document.getElementById("voice-btn").addEventListener("click", toggleVoiceRecognition);
 document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+document.getElementById("pause-btn").addEventListener("click", togglePause);
 
 let isListening = false;
+let isPaused = false;
 let recognition;
+let typingInterval; // 用於逐字顯示的間隔
+let currentResponse = ""; // 儲存完整的 AI 回應
 
 function sendMessage() {
     const userInput = document.getElementById("user-input").value.trim();
@@ -35,7 +39,8 @@ function sendMessage() {
         return response.json();
     })
     .then(data => {
-        typeLiyaResponse(data.response);
+        currentResponse = data.response;
+        typeLiyaResponse(currentResponse);
     })
     .catch(error => {
         errorMsg.textContent = error.message;
@@ -51,13 +56,23 @@ function typeLiyaResponse(response) {
     chatBox.appendChild(liyaMessage);
     
     let index = 0;
-    const typingInterval = setInterval(() => {
+    let isGenerating = true; // 確保可以停止生成
+
+    // 更新按鈕狀態
+    togglePauseButton(true);
+
+    typingInterval = setInterval(() => {
+        if (isPaused) {
+            clearInterval(typingInterval);
+            return;
+        }
         if (index < response.length) {
             liyaMessage.innerHTML += response.charAt(index);
             index++;
             chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
         } else {
             clearInterval(typingInterval);
+            togglePauseButton(false); // 恢復按鈕狀態
         }
     }, 50); // 調整速度
 }
@@ -114,6 +129,24 @@ function stopVoiceRecognition() {
     isListening = false;
     recognition.stop(); // 停止語音識別
     document.getElementById("voice-btn").innerHTML = '<i class="fas fa-microphone"></i>'; // 返回麥克風圖標
+}
+
+function togglePause() {
+    isPaused = !isPaused;
+    togglePauseButton(!isPaused);
+}
+
+function togglePauseButton(isActive) {
+    const pauseBtn = document.getElementById("pause-btn");
+    const sendBtn = document.getElementById("send-btn");
+
+    if (isActive) {
+        pauseBtn.classList.remove("hidden");
+        sendBtn.classList.add("hidden");
+    } else {
+        pauseBtn.classList.add("hidden");
+        sendBtn.classList.remove("hidden");
+    }
 }
 
 function logError(userInput, errorMessage) {
