@@ -72,11 +72,29 @@ function appendMessage(role, message) {
 function startVoiceRecognition() {
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'zh-TW';
+    recognition.interimResults = true; // 獲取即時結果
+
+    recognition.onstart = () => {
+        console.log("語音識別開始，請說話...");
+    };
+
     recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         document.getElementById("user-input").value = transcript;
-        sendMessage();
+        appendMessage("user", transcript); // 顯示語音輸入的文本
+        sendMessage(); // 自動發送
     };
+
+    recognition.onerror = (event) => {
+        console.error("語音識別錯誤:", event.error);
+        const errorMsg = document.getElementById("error-msg");
+        errorMsg.textContent = "語音識別發生錯誤，請重試。";
+    };
+
+    recognition.onend = () => {
+        console.log("語音識別結束。");
+    };
+
     recognition.start();
 }
 
