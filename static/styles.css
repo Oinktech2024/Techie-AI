@@ -11,19 +11,32 @@ body {
 .chat-container {
     background-color: #ffffff;
     border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
     padding: 20px;
     width: 450px;
     max-width: 90%;
     display: flex;
     flex-direction: column;
+    transition: all 0.3s ease; /* 添加過渡效果 */
 }
 
 h1 {
     text-align: center;
     color: #4CAF50;
-    font-size: 1.8em;
+    font-size: 2em;
     margin-bottom: 20px;
+    animation: slideIn 0.5s; /* 標題動畫 */
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 #chat-box {
@@ -34,12 +47,15 @@ h1 {
     margin-bottom: 10px;
     background-color: #f9f9f9;
     border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s; /* 背景顏色過渡 */
 }
 
 .user-message, .liya-message {
     margin: 10px 0;
     padding: 10px;
     border-radius: 10px;
+    animation: fadeIn 0.5s; /* 訊息動畫 */
 }
 
 .user-message {
@@ -65,18 +81,12 @@ h1 {
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-right: 10px;
+    transition: border-color 0.3s; /* 邊框顏色過渡 */
 }
 
-.liya-image {
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+#user-input:focus {
+    border-color: #4CAF50; /* 當聚焦時改變邊框顏色 */
+    outline: none;
 }
 
 #send-btn, #voice-btn {
@@ -88,11 +98,12 @@ h1 {
     cursor: pointer;
     font-weight: bold;
     margin-left: 5px;
-    transition: opacity 0.5s ease; /* 增加過渡效果 */
+    transition: background-color 0.3s, transform 0.3s; /* 添加背景顏色和縮放過渡 */
 }
 
 #send-btn:hover, #voice-btn:hover, .theme-btn:hover {
     background-color: #45a049;
+    transform: scale(1.05); /* 增加縮放效果 */
 }
 
 .error-message {
@@ -103,7 +114,7 @@ h1 {
 }
 
 .fade-in {
-    animation: fadeIn 0.5s;
+    animation: fadeIn 0.5s; /* 增加淡入動畫 */
 }
 
 @keyframes fadeIn {
