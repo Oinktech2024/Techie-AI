@@ -181,3 +181,50 @@ h1 {
     padding-left: 20px;
     list-style-type: decimal; /* 使用數字樣式 */
 }
+
+/* 美化「正在生成中」的樣式 */
+#loading-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px; /* 調整高度以適合動畫 */
+    font-size: 18px; /* 字體大小 */
+    color: #555; /* 字體顏色 */
+    animation: fadeIn 0.5s ease; /* 漸顯動畫 */
+}
+
+.loading-dots {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-left: 5px;
+    border-radius: 50%;
+    background-color: #007bff; /* 點的顏色 */
+    animation: bounce 0.6s infinite alternate; /* 點的彈跳動畫 */
+}
+
+.loading-dots:nth-child(2) {
+    animation-delay: 0.2s; /* 延遲第二個點的動畫 */
+}
+
+.loading-dots:nth-child(3) {
+    animation-delay: 0.4s; /* 延遲第三個點的動畫 */
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-10px); /* 彈跳高度 */
+    }
+}
