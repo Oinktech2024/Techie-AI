@@ -166,3 +166,13 @@ h1 {
     align-items: center;
     justify-content: space-between;
 }
+.highlighted {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #d9534f; /* 粗體文本顏色 */
+}
+
+.custom-list {
+    padding-left: 20px;
+    list-style-type: decimal; /* 使用數字樣式 */
+}
