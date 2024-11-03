@@ -45,7 +45,7 @@ def chat_with_character(prompt, character_name):
     ] + session['conversation_history']
 
     data = {
-        "model": "gpt-3.5-turbo",
+        "model": "gpt-4o-mini",
         "messages": messages
     }
 
