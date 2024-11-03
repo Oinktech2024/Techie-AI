@@ -189,6 +189,7 @@ function formatResponse(text) {
     // 格式化代碼（`代碼` 和 ```多行代碼```）
     formattedText = formattedText.replace(/`([^`]+)`/g, '<code>$1</code>');
     formattedText = formattedText.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+    formattedText = formattedText.replace(/<[^>]+>/g, ''); // 移除所有的 HTML 標籤
 
-    return formattedText;
+    return formattedText.trim();
 }
