@@ -1,75 +1,69 @@
-from flask import Flask, request, jsonify, render_template
-from transformers import (
-    BertTokenizer, BertForSequenceClassification,
-    GPT2Tokenizer, GPT2LMHeadModel,
-    T5Tokenizer, T5ForConditionalGeneration,
-    DistilBertTokenizer, DistilBertForSequenceClassification,
-    ViTFeatureExtractor, ViTForImageClassification,
-    WhisperProcessor, WhisperForConditionalGeneration
-)
-from PIL import Image
-import torch
+from flask import Flask, render_template, request, jsonify
+import requests
+import os
+from dotenv import load_dotenv
+
+# 載入環境變量
+load_dotenv()
 
 app = Flask(__name__)
 
-# 首頁
-@app.route('/')
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+BASE_URL = "https://api.chatanywhere.org/v1"
+
+# 保存對話歷史
+conversation_history = []
+
+# 定義與莉亞的對話函數
+def chat_with_liya(prompt):
+    headers = {
+        "Authorization": f"Bearer {OPENAI_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    # 將玩家的輸入與之前的對話歷史結合
+    conversation_history.append({"role": "user", "content": prompt})
+    messages = [
+        {"role": "system", "content": (
+            "你是莉亞，一位24歲的半精靈神秘學學徒和藥草師，擁有一頭波浪般的銀色長髮，"
+            "穿著深綠色的長袍，性格溫和且有親和力，善於藥草治療與符文魔法，"
+            "對未知事物充滿好奇，並小心保護自己擁有的秘密。"
+            "請依據角色設定回答玩家的問題，保持神秘和自然的氣息。"
+        )}
+    ] + conversation_history
+
+    data = {
+        "model": "gpt-3.5-turbo",
+        "messages": messages
+    }
+
+    try:
+        response = requests.post(f"{BASE_URL}/chat/completions", headers=headers, json=data)
+        response.raise_for_status()
+        response_json = response.json()
+        liya_response = response_json['choices'][0]['message']['content']
+        
+        # 保存莉亞的回應到對話歷史
+        conversation_history.append({"role": "assistant", "content": liya_response})
+        return liya_response
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        return "抱歉，目前無法連接到伺服器，請稍後再試。"
+    except KeyError:
+        return "抱歉，系統回應異常，請再試一次或聯繫管理員。"
+
+@app.route("/")
 def home():
-    return render_template('index.html')
+    return render_template("index.html")
 
-# 處理 NLP 請求
-@app.route('/nlp', methods=['POST'])
-def nlp():
-    text = request.form['text']
-    task = request.form['task']
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_input = request.json.get("prompt")
+    if not user_input:
+        return jsonify({"response": "請輸入有效的問題。"}), 400
+    
+    liya_response = chat_with_liya(user_input)
+    return jsonify({"response": liya_response})
 
-    if task == "bert_classify":
-        # 延遲加載 BERT 模型
-        bert_tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-        bert_model = BertForSequenceClassification.from_pretrained("bert-base-uncased")
-        inputs = bert_tokenizer(text, return_tensors='pt')
-        outputs = bert_model(**inputs)
-        result = torch.softmax(outputs.logits, dim=1).tolist()
-    elif task == "gpt2_generate":
-        # 延遲加載 GPT-2 模型
-        gpt2_tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-        gpt2_model = GPT2LMHeadModel.from_pretrained("gpt2")
-        inputs = gpt2_tokenizer.encode(text, return_tensors='pt')
-        outputs = gpt2_model.generate(inputs, max_length=50, num_return_sequences=1)
-        result = gpt2_tokenizer.decode(outputs[0], skip_special_tokens=True)
-    elif task == "t5_translate":
-        # 延遲加載 T5 模型
-        t5_tokenizer = T5Tokenizer.from_pretrained("t5-small")
-        t5_model = T5ForConditionalGeneration.from_pretrained("t5-small")
-        inputs = t5_tokenizer("translate English to French: " + text, return_tensors="pt")
-        outputs = t5_model.generate(inputs.input_ids)
-        result = t5_tokenizer.decode(outputs[0], skip_special_tokens=True)
-    else:
-        result = "未知的任務"
-
-    return jsonify({"result": result})
-
-# 處理圖像請求
-@app.route('/image', methods=['POST'])
-def image():
-    image_file = request.files['image']
-    task = request.form['task']
-    image = Image.open(image_file)
-
-    if task == "vit_classify":
-        # 延遲加載 ViT 模型
-        vit_processor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224")
-        vit_model = ViTForImageClassification.from_pretrained("google/vit-base-patch16-224")
-        inputs = vit_processor(images=image, return_tensors='pt')
-        outputs = vit_model(**inputs)
-        logits = outputs.logits
-        predicted_class = logits.argmax(-1).item()
-        result = f"Predicted class ID: {predicted_class}"
-    else:
-        result = "未知的圖像任務"
-
-    return jsonify({"result": result})
-
-# 啟動 Flask 伺服器
-if __name__ == '__main__':
-    app.run(debug=True,port=5000, host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(debug=True)
