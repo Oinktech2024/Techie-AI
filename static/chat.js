@@ -177,7 +177,7 @@ function formatResponse(text) {
                 formattedText += "</ol>"; // 關閉有序列表
                 isList = false;
             }
-            formattedText += `<p>${line}</p>`;
+            formattedText += `${line}`; // 直接加上行
         }
     });
 
