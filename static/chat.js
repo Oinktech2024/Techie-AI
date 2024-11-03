@@ -23,9 +23,7 @@ function sendMessage() {
     errorMsg.textContent = "";
     appendMessage("user", userInput);
     document.getElementById("user-input").value = "";
-
-    // 隱藏發送按鈕
-    toggleSendButtonVisibility(false);
+    toggleSendButtonVisibility(false); // 隱藏發送按鈕
 
     fetch("/chat", {
         method: "POST",
@@ -54,9 +52,11 @@ function typeLiyaResponse(response) {
     const chatBox = document.getElementById("chat-box");
     const liyaMessage = document.createElement("p");
     liyaMessage.classList.add("liya-message", "fade-in");
-    liyaMessage.innerHTML = `<strong>AI:</strong> `;
+    liyaMessage.innerHTML = `<strong><img src='bot.jpg' class='bot-head'></img>AI:</strong> `;
     chatBox.appendChild(liyaMessage);
-    
+
+    response = formatResponse(response); // 格式化響應
+
     let index = 0;
     const typingInterval = setInterval(() => {
         if (index < response.length) {
@@ -65,8 +65,7 @@ function typeLiyaResponse(response) {
             chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
         } else {
             clearInterval(typingInterval);
-            // 回復發送按鈕顯示
-            toggleSendButtonVisibility(true);
+            toggleSendButtonVisibility(true); // 回復發送按鈕顯示
         }
     }, 10); // 調整速度
 }
@@ -146,4 +145,35 @@ function toggleTheme() {
     themeBtn.innerHTML = document.body.classList.contains("dark-theme") ? 
         '<i class="fas fa-sun"></i>' : 
         '<i class="fas fa-moon"></i>';
+}
+
+function formatResponse(text) {
+    // 格式化粗體文本（**這樣**）
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong class="highlighted">$1</strong>');
+
+    // 格式化有序列表
+    let lines = text.split("\n");
+    let formattedText = "";
+    let isList = false;
+    let listCounter = 1;
+
+    lines.forEach(line => {
+        if (/^\d+\.\s/.test(line)) { // 檢測排序數字
+            if (!isList) {
+                formattedText += "<ol class='custom-list'>";
+                isList = true;
+            }
+            formattedText += `<li>${line.replace(/^\d+\.\s/, "")}</li>`;
+        } else {
+            if (isList) {
+                formattedText += "</ol>";
+                isList = false;
+            }
+            formattedText += `<p>${line}</p>`;
+        }
+    });
+
+    if (isList) formattedText += "</ol>"; // 關閉未完成的列表
+
+    return formattedText;
 }
