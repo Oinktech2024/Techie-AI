@@ -34,12 +34,15 @@ h1 {
     margin-bottom: 10px;
     background-color: #f9f9f9;
     border-radius: 10px;
+    transition: background-color 0.3s ease;
 }
 
 .user-message, .liya-message {
     margin: 10px 0;
     padding: 10px;
     border-radius: 10px;
+    opacity: 0; /* 初始隱藏 */
+    animation: fadeIn 0.5s forwards; /* 添加淡入動畫 */
 }
 
 .user-message {
@@ -54,6 +57,12 @@ h1 {
     color: #333;
 }
 
+@keyframes fadeIn {
+    to {
+        opacity: 1; /* 最終顯示 */
+    }
+}
+
 .input-container {
     display: flex;
     align-items: center;
@@ -66,11 +75,13 @@ h1 {
     border-radius: 5px;
     margin-right: 10px;
 }
+
 .liya-image {
     border-radius: 50%;
     width: 50px;
     height: 50px;
 }
+
 .header {
     display: flex;
     align-items: center;
@@ -85,6 +96,7 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     font-weight: bold;
+    transition: background-color 0.3s;
 }
 
 #send-btn:hover {
