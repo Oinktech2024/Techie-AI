@@ -54,7 +54,7 @@ function typeLiyaResponse(response) {
     const chatBox = document.getElementById("chat-box");
     const liyaMessage = document.createElement("p");
     liyaMessage.classList.add("liya-message", "fade-in");
-    liyaMessage.innerHTML = `<strong>莉亞:</strong> `;
+    liyaMessage.innerHTML = `<strong>AI:</strong> `;
     chatBox.appendChild(liyaMessage);
     
     let index = 0;
@@ -76,7 +76,7 @@ function appendMessage(role, message) {
     const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const messageElement = document.createElement("p");
     messageElement.classList.add(role === "user" ? "user-message" : "liya-message", "fade-in");
-    messageElement.innerHTML = `<strong>${role === "user" ? '你' : '莉亞'}:</strong> ${message} <span class="timestamp">${timestamp}</span>`;
+    messageElement.innerHTML = `<strong>${role === "user" ? '你' : 'AI'}:</strong> ${message} <span class="timestamp">${timestamp}</span>`;
     chatBox.appendChild(messageElement);
     chatBox.scrollTop = chatBox.scrollHeight; // 確保聊天框滾動到最新消息
 }
