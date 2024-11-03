@@ -6,16 +6,6 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    transition: background-color 0.3s ease;
-}
-
-.dark-theme {
-    background-color: #333;
-    color: #fff;
-}
-
-.hidden {
-    display: none;
 }
 
 .chat-container {
@@ -27,17 +17,12 @@ body {
     max-width: 90%;
     display: flex;
     flex-direction: column;
-    transition: background-color 0.3s ease;
-}
-
-.dark-theme .chat-container {
-    background-color: #444;
 }
 
 h1 {
     text-align: center;
     color: #4CAF50;
-    font-size: 2em;
+    font-size: 1.8em;
     margin-bottom: 20px;
 }
 
@@ -49,46 +34,29 @@ h1 {
     margin-bottom: 10px;
     background-color: #f9f9f9;
     border-radius: 10px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.dark-theme #chat-box {
-    background-color: #555;
-    border-color: #666;
 }
 
 .user-message, .liya-message {
     margin: 10px 0;
-    padding: 10px 15px; /* 增加內邊距 */
+    padding: 10px;
     border-radius: 10px;
-    animation: fadeIn 0.5s ease;
-    position: relative; /* 為定位提供參考 */
 }
 
 .user-message {
     background-color: #e0f7da;
     text-align: right;
     color: #333;
-    border-bottom-right-radius: 0; /* 圓角調整 */
 }
 
 .liya-message {
     background-color: #ffe0e6;
     text-align: left;
     color: #333;
-    border-bottom-left-radius: 0; /* 圓角調整 */
-}
-
-.timestamp {
-    font-size: 0.8em;
-    color: #888;
-    margin-left: 10px;
 }
 
 .input-container {
     display: flex;
     align-items: center;
-    margin-top: 10px; /* 上邊距 */
 }
 
 #user-input {
@@ -97,14 +65,12 @@ h1 {
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-right: 10px;
-    font-size: 1em; /* 字體大小 */
 }
 
 .liya-image {
     border-radius: 50%;
     width: 50px;
     height: 50px;
-    margin-right: 10px; /* 右邊距 */
 }
 
 .header {
@@ -113,7 +79,7 @@ h1 {
     justify-content: space-between;
 }
 
-#send-btn, #voice-btn, .theme-btn {
+#send-btn, #voice-btn {
     padding: 12px;
     border: none;
     background-color: #4CAF50;
@@ -122,9 +88,7 @@ h1 {
     cursor: pointer;
     font-weight: bold;
     margin-left: 5px;
-    transition: background-color 0.3s ease; /* 添加過渡效果 */
-    display: flex;
-    align-items: center; /* 讓圖標和文字垂直居中 */
+    transition: opacity 0.5s ease; /* 增加過渡效果 */
 }
 
 #send-btn:hover, #voice-btn:hover, .theme-btn:hover {
@@ -139,7 +103,7 @@ h1 {
 }
 
 .fade-in {
-    animation: fadeIn 0.5s ease;
+    animation: fadeIn 0.5s;
 }
 
 @keyframes fadeIn {
@@ -151,35 +115,31 @@ h1 {
     }
 }
 
-/* 自定義按鈕樣式 */
-button {
-    display: inline-flex; /* 讓按鈕內的元素水平排列 */
-    align-items: center; /* 垂直居中 */
+.dark-theme {
+    background-color: #333;
+    color: #f5f9f5;
 }
 
-/* 音量按鈕的顏色 */
-#voice-btn {
-    background-color: #007bff; /* 藍色 */
+.dark-theme .chat-container {
+    background-color: #444;
 }
 
-#voice-btn:hover {
-    background-color: #0056b3; /* 藍色 */
+.dark-theme .user-message {
+    background-color: #555;
+}
+
+.dark-theme .liya-message {
+    background-color: #666;
+}
+
+.timestamp {
+    font-size: 0.7em;
+    color: #888;
 }
 
 .theme-btn {
-    background-color: #ff9800; /* 橙色 */
-}
-
-.theme-btn:hover {
-    background-color: #e68900; /* 深橙色 */
-}
-
-/* 增加整體排版 */
-@media (max-width: 600px) {
-    .chat-container {
-        width: 95%; /* 手機屏幕更大 */
-    }
-    h1 {
-        font-size: 1.5em; /* 更小的標題字體 */
-    }
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4CAF50;
 }
