@@ -1,78 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>Hugging Face Model Integration</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            margin-top: 50px;
-        }
-        .card {
-            margin-bottom: 20px;
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
-        }
-        .card-header {
-            background-color: #007bff;
-            color: white;
-            border-radius: 10px 10px 0 0;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border: none;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>與莉亞對話</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-center">使用 Hugging Face 模型</h1>
-        <div class="card">
-            <div class="card-header">NLP 任務</div>
-            <div class="card-body">
-                <form action="/nlp" method="post">
-                    <div class="form-group">
-                        <label for="text">輸入文字:</label>
-                        <input type="text" class="form-control" id="text" name="text" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="task">選擇任務:</label>
-                        <select class="form-control" id="task" name="task">
-                            <option value="bert_classify">BERT 分類</option>
-                            <option value="gpt2_generate">GPT-2 生成</option>
-                            <option value="t5_translate">T5 翻譯</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">提交</button>
-                </form>
-            </div>
+    <div class="chat-container">
+        <div class="header">
+            <h1>與莉亞對話</h1>
+            <img src="/static/liya.jpg" alt="Liya" class="liya-image">
         </div>
-
-        <div class="card">
-            <div class="card-header">圖像任務</div>
-            <div class="card-body">
-                <form action="/image" method="post" enctype="multipart/form-data">
-                    <div class="form-group">
-                        <label for="image">上傳圖片:</label>
-                        <input type="file" class="form-control-file" id="image" name="image" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="task">選擇任務:</label>
-                        <select class="form-control" id="task" name="task">
-                            <option value="vit_classify">ViT 圖像分類</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">提交</button>
-                </form>
-            </div>
+        <div id="chat-box"></div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="輸入你的問題..." />
+            <button id="send-btn">發送</button>
         </div>
+        <div id="error-msg" class="error-message"></div>
     </div>
+    <script src="/static/chat.js"></script>
 </body>
 </html>
