@@ -154,3 +154,15 @@ h1 {
     cursor: pointer;
     color: #4CAF50;
 }
+
+.liya-image {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
