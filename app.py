@@ -1,48 +1,43 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify
 import requests
 import os
 from dotenv import load_dotenv
+import logging
 
 # 載入環境變量
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY")  # 用於會話管理
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 BASE_URL = "https://api.chatanywhere.org/v1"
 
-# 讀取角色描述
-def load_character_descriptions():
-    characters = {}
-    with open('character_descriptions.txt', 'r', encoding='utf-8') as file:
-        content = file.read()
-        for section in content.split("\n\n"):
-            if section.strip():
-                lines = section.strip().split("\n")
-                name = lines[0].strip('[]')  # 獲取角色名稱
-                description = "\n".join(lines[1:])  # 獲取角色描述
-                characters[name] = description
-    return characters
+# 設置日誌記錄
+logging.basicConfig(level=logging.ERROR)
 
-characters = load_character_descriptions()
+# 保存對話歷史
+conversation_history = {}
 
-# 定義與角色的對話函數
-def chat_with_character(prompt, character_name):
+# 定義與莉亞的對話函數
+def chat_with_liya(prompt, session_id):
+    if session_id not in conversation_history:
+        conversation_history[session_id] = []
+
     headers = {
         "Authorization": f"Bearer {OPENAI_API_KEY}",
         "Content-Type": "application/json"
     }
-
-    # 確保每個用戶的對話歷史是獨立的
-    if 'conversation_history' not in session:
-        session['conversation_history'] = []
-
+    
     # 將玩家的輸入與之前的對話歷史結合
-    session['conversation_history'].append({"role": "user", "content": prompt})
+    conversation_history[session_id].append({"role": "user", "content": prompt})
     messages = [
-        {"role": "system", "content": characters[character_name]}
-    ] + session['conversation_history']
+        {"role": "system", "content": (
+            "你是莉亞，一位24歲的半精靈神秘學學徒和藥草師，擁有一頭波浪般的銀色長髮，"
+            "穿著深綠色的長袍，性格溫和且有親和力，善於藥草治療與符文魔法，"
+            "對未知事物充滿好奇，並小心保護自己擁有的秘密。"
+            "請依據角色設定回答玩家的問題，保持神秘和自然的氣息。"
+        )}
+    ] + conversation_history[session_id]
 
     data = {
         "model": "gpt-4o-mini",
@@ -53,30 +48,30 @@ def chat_with_character(prompt, character_name):
         response = requests.post(f"{BASE_URL}/chat/completions", headers=headers, json=data)
         response.raise_for_status()
         response_json = response.json()
-        character_response = response_json['choices'][0]['message']['content']
+        liya_response = response_json['choices'][0]['message']['content']
         
-        # 保存角色的回應到對話歷史
-        session['conversation_history'].append({"role": "assistant", "content": character_response})
-        return character_response
+        # 保存莉亞的回應到對話歷史
+        conversation_history[session_id].append({"role": "assistant", "content": liya_response})
+        return liya_response
     except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
+        logging.error(f"Error: {e}")
         return "抱歉，目前無法連接到伺服器，請稍後再試。"
     except KeyError:
         return "抱歉，系統回應異常，請再試一次或聯繫管理員。"
 
 @app.route("/")
 def home():
-    return render_template("index.html", characters=characters.keys())
+    return render_template("index.html")
 
 @app.route("/chat", methods=["POST"])
 def chat():
     user_input = request.json.get("prompt")
-    character_name = request.json.get("character")  # 獲取所選角色名稱
-    if not user_input or character_name not in characters:
-        return jsonify({"response": "請輸入有效的問題和選擇有效的角色。"}), 400
+    session_id = request.headers.get("X-Session-ID")  # 使用 session ID 來分隔對話
+    if not user_input:
+        return jsonify({"response": "請輸入有效的問題。"}), 400
     
-    character_response = chat_with_character(user_input, character_name)
-    return jsonify({"response": character_response})
+    liya_response = chat_with_liya(user_input, session_id)
+    return jsonify({"response": liya_response})
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=10000)
+    app.run(debug=True,port=10000, host='0.0.0.0')
