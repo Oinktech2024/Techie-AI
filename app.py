@@ -64,9 +64,6 @@ def home():
 def chat():
     user_input = request.json.get("prompt")
     session_id = request.headers.get("X-Session-ID")  # 使用 session ID 來分隔對話
-    if not session_id:  # 如果沒有提供 session ID，生成一個新的
-        session_id = str(uuid.uuid4())
-    
     if not user_input:
         return jsonify({"response": "請輸入有效的問題。"}), 400
     
