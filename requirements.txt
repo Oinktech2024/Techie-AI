@@ -4,3 +4,4 @@ python-dotenv
 werkzeug
 pymongo
 flask-session
+flask-cors
