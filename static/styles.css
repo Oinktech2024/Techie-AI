@@ -16,13 +16,12 @@
         transition: '0.2s ease'
     };
 
-    // 引入按鈕創建腳本並傳遞配置參數
     const buttonScript = document.createElement('script');
     buttonScript.src = 'https://oinktech.github.io/BACKTOHOMEBUTTON/@1-0-0/script.js';
     buttonScript.onload = () => createHomeButton(buttonConfig);
     document.head.appendChild(buttonScript);
 
-    // 引入鏈接監聽腳本
+
     function loadScript(url) {
         return new Promise((resolve, reject) => {
             const script = document.createElement('script');
