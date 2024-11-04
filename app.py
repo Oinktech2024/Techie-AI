@@ -4,11 +4,14 @@ import os
 from dotenv import load_dotenv
 import logging
 from pymongo import MongoClient
+from flask_cors import CORS  # 導入 CORS
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)  # 啟用 CORS，這將允許所有來源的請求
+
 app.secret_key = os.urandom(24)  # Secret key for session management
 
 # Retrieve API key, MongoDB URI, and AI Prompt from environment variables
