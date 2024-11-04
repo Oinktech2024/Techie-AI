@@ -1,230 +1,39 @@
-body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: #f5f9f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
+(function() {
+    // 配置參數
+    const buttonConfig = {
+        width: '70px',
+        height: '70px',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        hoverBackgroundColor: 'rgba(0, 0, 0, 0.5)',
+        borderRadius: '8px',
+        fontSize: '14px',
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+        bottom: '20px',
+        right: '20px',
+        iconSize: '20px',
+        textColor: '#00BFFF',
+        textSize: '10px',
+        transition: '0.2s ease'
+    };
 
-.chat-container {
-    background-color: #ffffff;
-    border-radius: 15px;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    width: 450px;
-    max-width: 90%;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.3s ease; /* 添加過渡效果 */
-}
+    // 引入按鈕創建腳本並傳遞配置參數
+    const buttonScript = document.createElement('script');
+    buttonScript.src = 'https://oinktech.github.io/BACKTOHOMEBUTTON/@1-0-0/script.js';
+    buttonScript.onload = () => createHomeButton(buttonConfig);
+    document.head.appendChild(buttonScript);
 
-h1 {
-    text-align: center;
-    color: #4CAF50;
-    font-size: 2em;
-    margin-bottom: 20px;
-    animation: slideIn 0.5s; /* 標題動畫 */
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateY(-20px);
-        opacity: 0;
+    // 引入鏈接監聽腳本
+    function loadScript(url) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = url;
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('Script load error'));
+            document.head.appendChild(script);
+        });
     }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
 
-#chat-box {
-    border: 1px solid #ddd;
-    padding: 15px;
-    height: 350px;
-    overflow-y: auto;
-    margin-bottom: 10px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.3s; /* 背景顏色過渡 */
-}
-
-.user-message, .liya-message {
-    margin: 10px 0;
-    padding: 10px;
-    border-radius: 10px;
-    animation: fadeIn 0.5s; /* 訊息動畫 */
-}
-
-.user-message {
-    background-color: #e0f7da;
-    text-align: right;
-    color: #333;
-}
-
-.liya-message {
-    background-color: #ffe0e6;
-    text-align: left;
-    color: #333;
-}
-
-.input-container {
-    display: flex;
-    align-items: center;
-}
-
-#user-input {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-right: 10px;
-    transition: border-color 0.3s; /* 邊框顏色過渡 */
-}
-
-#user-input:focus {
-    border-color: #4CAF50; /* 當聚焦時改變邊框顏色 */
-    outline: none;
-}
-
-#send-btn, #voice-btn {
-    padding: 12px;
-    border: none;
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-left: 5px;
-    transition: background-color 0.3s, transform 0.3s; /* 添加背景顏色和縮放過渡 */
-}
-
-#send-btn:hover, #voice-btn:hover, .theme-btn:hover {
-    background-color: #45a049;
-    transform: scale(1.05); /* 增加縮放效果 */
-}
-
-.error-message {
-    color: red;
-    font-size: 0.85em;
-    text-align: center;
-    margin-top: 5px;
-}
-
-.fade-in {
-    animation: fadeIn 0.5s; /* 增加淡入動畫 */
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-.dark-theme {
-    background-color: #333;
-    color: #f5f9f5;
-}
-
-.dark-theme .chat-container {
-    background-color: #444;
-}
-
-.dark-theme .user-message {
-    background-color: #555;
-}
-
-.dark-theme .liya-message {
-    background-color: #666;
-}
-
-.timestamp {
-    font-size: 0.7em;
-    color: #888;
-}
-
-.theme-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #4CAF50;
-}
-
-.liya-image {
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-}
-.bot-head {
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.highlighted {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: #d9534f; /* 粗體文本顏色 */
-}
-
-.custom-list {
-    padding-left: 20px;
-    list-style-type: decimal; /* 使用數字樣式 */
-}
-
-/* 美化「正在生成中」的樣式 */
-#loading-message {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 50px; /* 調整高度以適合動畫 */
-    font-size: 18px; /* 字體大小 */
-    color: #555; /* 字體顏色 */
-    animation: fadeIn 0.5s ease; /* 漸顯動畫 */
-}
-
-.loading-dots {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    margin-left: 5px;
-    border-radius: 50%;
-    background-color: #007bff; /* 點的顏色 */
-    animation: bounce 0.6s infinite alternate; /* 點的彈跳動畫 */
-}
-
-.loading-dots:nth-child(2) {
-    animation-delay: 0.2s; /* 延遲第二個點的動畫 */
-}
-
-.loading-dots:nth-child(3) {
-    animation-delay: 0.4s; /* 延遲第三個點的動畫 */
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes bounce {
-    from {
-        transform: translateY(0);
-    }
-    to {
-        transform: translateY(-10px); /* 彈跳高度 */
-    }
-}
+    loadScript('https://oinktech.github.io/LinkAware/@1.0.0/script.js')
+        .then(() => console.log('Script loaded successfully'))
+        .catch(error => console.error(error));
+})();
