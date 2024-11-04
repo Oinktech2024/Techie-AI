@@ -11,9 +11,10 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Secret key for session management
 
-# Retrieve API key and MongoDB URI from environment variables
+# Retrieve API key, MongoDB URI, and AI Prompt from environment variables
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 MONGODB_URI = os.getenv("MONGODB_URI")
+AI_PROMPT = os.getenv("AI_PROMPT")  # Load AI Prompt from environment variable
 BASE_URL = "https://api.chatanywhere.org/v1"
 
 # Set up logging
@@ -23,6 +24,12 @@ logging.basicConfig(level=logging.ERROR)
 client = MongoClient(MONGODB_URI)
 db = client.get_default_database()
 prompts_collection = db.prompts
+
+# Check and add default prompt from environment variable if it does not exist
+if AI_PROMPT:
+    existing_prompt = prompts_collection.find_one()
+    if not existing_prompt:
+        prompts_collection.insert_one({"prompt": AI_PROMPT})
 
 # Save conversation history using session_id as key
 conversation_history = {}
